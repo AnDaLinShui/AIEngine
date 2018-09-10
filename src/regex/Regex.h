@@ -1,0 +1,169 @@
+/*
+ * AIEngine a new generation network intrusion detection system.
+ *
+ * Copyright (C) 2013-2018  Luis Campo Giralte
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Ryadnology Team; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the
+ * Ryadnology Team, 51 Franklin St, Fifth Floor,
+ * Boston, MA  02110-1301, USA.
+ *
+ * Written by Luis Campo Giralte <me@ryadpasha.com> 
+ *
+ */
+#ifndef SRC_REGEX_REGEX_H_
+#define SRC_REGEX_REGEX_H_
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#include <boost/format.hpp>
+#include <boost/utility/string_ref.hpp>
+#include <pcre.h>
+#include <regex>
+#if defined(RUBY_BINDING)
+#include <list>
+#endif
+
+#include "Signature.h"
+#include "Pointer.h"
+
+namespace aiengine {
+
+class RegexManager;
+
+#if defined(RUBY_BINDING)
+
+// Global list of Regex objects so the ruby garbage collector
+// dont have problems with the destruction of the nested shared pointers
+
+static std::list<SharedPointer<void>> free_list;
+
+struct RegexNullDeleter {
+	template<typename T> 
+
+	void operator()(T*) {} 
+};
+
+#endif
+
+class Regex: public Signature {
+public:
+#if defined(PYTHON_BINDING)
+	explicit Regex(const std::string &name, const std::string &exp, boost::python::object callback, const SharedPointer<Regex> &re);
+	explicit Regex(const std::string &name, const std::string &exp, boost::python::object callback);
+#endif
+	explicit Regex(const std::string &name, const std::string &exp, const SharedPointer<Regex> &re);
+	explicit Regex(const std::string &name, const std::string &exp);
+	explicit Regex(): Regex("All", "^.*$") {}
+	virtual ~Regex(); 
+ 
+	bool evaluate(const boost::string_ref &data);
+
+	friend std::ostream& operator<< (std::ostream &out, const Regex &sig);
+
+	bool isTerminal() const { return is_terminal_;}
+	void setNextRegex(const SharedPointer<Regex> &reg); 
+	SharedPointer<Regex> getNextRegex() { return next_regex_;}
+
+	// Reference to the next RegexManager for use on the flow
+	void setNextRegexManager(const SharedPointer<RegexManager> &rm); 
+	SharedPointer<RegexManager> getNextRegexManager() const { return rm_; }
+
+	void setEvidence(bool value) { have_evidence_ = value; }
+	bool haveEvidence() const { return have_evidence_; }
+
+#if defined(RUBY_BINDING)
+
+	void setNextRegex(Regex &reg) {
+
+		// Assign a null deleter to the objects created from ruby to avoid
+		// conflicts with the ruby garbage collector
+
+        	SharedPointer<Regex> r(new Regex(), RegexNullDeleter());
+        	r.reset(&reg);
+
+		// Add a reference to the shared regex object
+		free_list.push_back(r);
+        	setNextRegex(r);
+	}
+
+	void setNextRegexManager(RegexManager &regex_mng) {
+		
+		SharedPointer<RegexManager> rm;
+/*        	TODO:
+		SharedPointer<RegexManager> rm = SharedPointer<RegexManager>(new RegexManager());
+        	rm.reset(&regex_mng);
+
+        	setNextRegexManager(rm);
+*/
+	}
+
+#elif defined(JAVA_BINDING)
+
+	void setNextRegex(Regex *reg);
+	void setNextRegexManager(RegexManager *regex_mng); 
+
+#endif
+	bool matchAndExtract(const boost::string_ref &data);
+
+	const char *getExtract() const { return extract_buffer_;} 
+
+	// For show the matched regex on std::cout
+	void setShowMatch(bool value) { show_match_ = value; }
+	bool getShowMatch() const { return show_match_; }
+
+	// For show the matched packet on std::cout
+	void setShowPacket(bool value) { show_packet_ = value; }
+	bool getShowPacket() const { return show_packet_; }
+
+	// For continue evaluating the flow 
+	void setContinue(bool value) { continue_ = value; }
+	bool getContinue() const { return continue_; }
+
+	// For write the matched packet on disk with DatabaseAdaptors, check Flow.cc file
+	void setWritePacket(bool value) { write_packet_ = value; }
+	bool getWritePacket() const { return write_packet_; }
+
+private:
+	pcre *exp_;
+	pcre_extra *study_exp_;
+	static int ovecount_[32];
+	static char extract_buffer_[256];
+	SharedPointer<Regex> next_regex_;
+
+#if defined(JAVA_BINDING) // For some reason the alignment is not working in Java
+	bool is_terminal_;
+	bool have_jit_;
+	bool show_match_;
+	bool show_packet_;
+	bool write_packet_;
+	bool have_evidence_;
+	bool continue_;
+#else
+	bool is_terminal_:1;
+	bool have_jit_:1;
+	bool show_match_:1;
+	bool show_packet_:1;
+	bool write_packet_:1;
+	bool have_evidence_:1;
+	bool continue_:1;
+#endif
+	SharedPointer<RegexManager> rm_;
+};
+
+} // namespace aiengine
+
+#endif  // SRC_REGEX_REGEX_H_
+

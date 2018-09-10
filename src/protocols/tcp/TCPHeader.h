@@ -1,0 +1,199 @@
+/*
+ * AIEngine a new generation network intrusion detection system.
+ *
+ * Copyright (C) 2013-2018  Luis Campo Giralte
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Ryadnology Team; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the
+ * Ryadnology Team, 51 Franklin St, Fifth Floor,
+ * Boston, MA  02110-1301, USA.
+ *
+ * Written by Luis Campo Giralte <me@ryadpasha.com> 
+ *
+ */
+#ifndef SRC_PROTOCOLS_TCP_TCPHEADER_H_ 
+#define SRC_PROTOCOLS_TCP_TCPHEADER_H_
+
+//
+//   0                   1                   2                   3
+//   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+//  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//  |          Source Port          |       Destination Port        |
+//  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//  |                        Sequence Number                        |
+//  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//  |                    Acknowledgment Number                      |
+//  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//  |  Data |           |U|A|P|R|S|F|                               |
+//  | Offset| Reserved  |R|C|S|S|Y|I|            Window             |
+//  |       |           |G|K|H|T|N|N|                               |
+//  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//  |           Checksum            |         Urgent Pointer        |
+//  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//  |                    Options                    |    Padding    |
+//  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//  |                             data                              |
+//  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//
+//           TCP Header Format From the Figure 3 of RFC 793
+//
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#include <iostream>
+#include <cstring>
+#include <netinet/in.h>
+#include <netinet/ip6.h>
+#include <netinet/tcp.h>
+
+namespace aiengine {
+
+// Compilers > that 5 have a improvement on the list initializations
+#define GCC_VERSION (__GNUG__ * 10000 \
+	+ __GNUC_MINOR__ * 100 \
+        + __GNUC_PATCHLEVEL__)
+
+/* LCOV_EXCL_START */
+
+class TCPHeader {
+public:
+    	TCPHeader(uint16_t src,uint16_t dst,uint32_t seq, uint32_t ack):
+		tcphdr_{
+#if defined(__FREEBSD__) || (__OPENBSD__) || defined(__DARWIN__)
+			htons(src),	// th_sport
+			htons(dst),	// th_dport
+			htonl(seq),	// th_seq
+			htonl(ack),	// th_ack
+			0x00,		// th_tx2
+			0x00,		// th_off
+			0x00,		// th_flags
+			4016,		// th_win
+			0,		// th_sum
+			0		// th_urg
+#else
+                        htons(src),     // source
+                        htons(dst),     // destination
+                        htonl(seq),     // seq
+                        htonl(ack),     // ack_seq
+                        0,              // res1
+                        5,              // doff
+#if GCC_VERSION < 50000
+                        0,              // fin
+                        0,              // syn
+                        0,              // rst
+                        0,              // psh
+                        0,              // ack
+                        0,              // urg
+#endif
+                        0,
+                        4016,           // window
+                        0,              // check
+                        0               // urg_ptr
+#endif
+		}{}
+	TCPHeader(uint16_t src, uint16_t dst): TCPHeader(src,dst,0,0) {}
+    	TCPHeader():TCPHeader(0,0,0,0) {}
+
+    	virtual ~TCPHeader() {}
+
+#if defined(__FREEBSD__) || (__OPENBSD__) || defined(__DARWIN__)
+        uint16_t getSourcePort() const { return ntohs(tcphdr_.th_sport); }
+        uint16_t getDestinationPort() const { return ntohs(tcphdr_.th_dport); }
+        uint32_t getSequence() const  { return ntohl(tcphdr_.th_seq); }
+        uint32_t getAckSequence() const  { return ntohl(tcphdr_.th_ack); }
+
+	void setSrcPort(uint16_t port) { tcphdr_.th_sport = htons(port); }
+	
+	void setSequenceNumber(uint32_t seq) { tcphdr_.th_seq = htonl(seq); }
+	void setAcknoledgementNumber(uint32_t ack) { tcphdr_.th_ack = htonl(ack); }
+	void setWindowSize(uint16_t window) { tcphdr_.th_win = htons(window); }
+	void setFlagRst(bool rst) { tcphdr_.th_flags = (rst) ? TH_RST : 0; }
+
+	void setChecksum(uint16_t check) { tcphdr_.th_sum = check; }
+#else
+        uint32_t getSequence() const  { return ntohl(tcphdr_.seq); }
+        uint32_t getAckSequence() const  { return ntohl(tcphdr_.ack_seq); }
+        uint16_t getSourcePort() const { return ntohs(tcphdr_.source); }
+        uint16_t getDestinationPort() const { return ntohs(tcphdr_.dest); }
+	
+	void setSrcPort(uint16_t port) { tcphdr_.source = htons(port); }
+	void setFlagRst(bool rst) { tcphdr_.rst = (rst) ? 1 : 0; }
+	
+	void setSequenceNumber(uint32_t seq) { tcphdr_.seq = htonl(seq); }
+	void setAcknoledgementNumber(uint32_t ack) { tcphdr_.ack_seq = htonl(ack); }
+	
+	void setWindowSize(uint16_t window) { tcphdr_.window = htons(window); }
+	void setDoff(uint16_t doff) { tcphdr_.doff = doff; }
+	void setChecksum(uint16_t check) { tcphdr_.check = check; }
+#endif
+
+        friend std::ostream& operator<<(std::ostream &os, TCPHeader &hdr) {
+
+                char *raw = reinterpret_cast<char*>(&hdr.tcphdr_);
+		
+                return os.write(raw,sizeof(hdr.tcphdr_));
+        }
+
+        friend std::istream& operator>>(std::istream &is, TCPHeader &hdr) {
+
+                char *raw = reinterpret_cast<char*>(&hdr.tcphdr_);
+
+                return is.read(raw,sizeof(hdr.tcphdr_));
+        }
+
+    	void computeChecksum(uint32_t srcaddr, uint32_t destaddr);
+	void computeChecksum(struct ip6_hdr *ip6);
+
+	std::size_t size() const { return sizeof(struct tcphdr); }
+
+private:
+	struct tcphdr tcphdr_;
+
+	uint16_t get_ipv6_psd_sum (struct ip6_hdr * ip_hdr);
+	uint16_t get_16b_sum(uint16_t *ptr16, uint32_t nr);
+
+    	unsigned short checksum(unsigned short *buf, int bufsz) {
+      		unsigned long sum = 0;
+        
+		while( bufsz > 1 ) {
+            		sum += *buf++;
+            		bufsz -= 2;
+        	}
+        	if (bufsz == 1)
+            		sum += *(unsigned char *)buf;
+        	sum = (sum & 0xffff) + (sum >> 16);
+        	sum = (sum & 0xffff) + (sum >> 16);
+        	return ~sum;
+    	}
+
+    	struct tcph_pseudo {    // TCP pseudo header for header checksum
+        	uint32_t ip_src;    // Source IP address
+            	uint32_t ip_dst;    // Destination IP address
+            	uint8_t zero;      // Always 0
+            	uint8_t  protocol;  // IPPROTO_TCP
+            	uint16_t length;    // tcp header length + payload length (Not contained pseudo header)
+    	};
+
+    	struct tcp_checksum {
+        	struct tcph_pseudo pseudo;
+            	struct tcphdr tcp;
+    	};
+};
+
+/* LCOV_EXCL_STOP */
+
+} // namespace aiengine 
+
+#endif  // SRC_PROTOCOLS_TCP_TCPHEADER_H_

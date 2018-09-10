@@ -1,0 +1,207 @@
+It seems that on g++4.7.2 there is a bug with the optimization, so we keep the code on -O0.
+
+Features of 0.2.
+- Support for chainging regex.
+- HTTP domain accesing.
+- Support for IPv6 with a new NetworkStack
+
+Features of 0.3.
+- Regex bug of \x00 charater.
+- Integration of IPv4 and IPv6 stack on one.
+- Freebsd support for the aiengine binary (not the python wrapper).
+- Support for Host names on SSL traffic.
+- Support for banned domains and hosts for HTTP, DNS and SSL
+- Support for sigusr1, sigusr2 on the aiengine binary for dump stats.
+- TCP finite state machine (beta).
+
+Features of 0.4
+- Pcre with JIT support.
+- FreeBSD full python support.
+
+Some benchmark results of 0.4 version
+
+	EthernetProtocol(0xa36010) statistics
+		Total packets:                   0
+		Total bytes:         2065338805586
+		Total validated packets:3408802476
+		Total malformed packets:   6723295
+	Multiplexer(0xa52a80) statistics
+		Plugged to object(0xa36010)
+		Total forward packets:  3408802476
+		Total received packets: 3408802476
+		Total fail packets:              0
+
+	IPProtocol(0xa36220) statistics
+		Total packets:          3408802476
+		Total bytes:         2017615570922
+		Total validated packets:3408802476
+		Total malformed packets:         0
+	Multiplexer(0xa52f00) statistics
+		Plugged to object(0xa36220)
+		Total forward packets:  3408802476
+		Total received packets: 3408802476
+		Total fail packets:              0
+
+Features of 0.5
+- Fix minor bugs (printFlows, runPcap and run)
+- DatabaseAdaptor generated on python, so a lot of databases could be use, redis, voltdb, postgress.
+  Check redis_adaptor.py as a example on /examples
+
+Features of 0.6
+- Ip Filters for ip matching rules (unordered_set(ready), bloom filters(planned)).
+- Minor bugs (leak on pcre). 
+- Python Wrapper IPSet and IPSetManager for manage the ip filters.
+
+Features of 0.7
+- Fix bug on the destructors of the Regex.
+- Tested on Fedora 20.
+- Improvements on the iterators of the python side.
+- Unit tests for python.
+- Compilation on O3 optimization.
+- Bloom filters implemented on the python wrapper (Boost bloom filter).
+
+Features of 0.8
+- Counters for IP fragmentation packets.
+- Support for TLS1.2 on the SSLProtocol
+- Exposed the FrequencyGroup and the LearnerEngine on python.
+- Expose a handler function on the PacketDispatcher for integrate with NetfilterPython or other packet systems.
+- Support for python 3.x versions (check INSTALL).
+- Sorts the outputs of the HTTP, SSL and DNS most used domains (aiengine binary).
+- Support for HTTP1.1 (URI Cache), all the flows will have all the paths taken by the user.
+- Shell support. The system have a interactive shell so the user can interact on realtime with the system.
+
+Features of 0.9
+- Support for ICMPv6 on the IPv6 stack
+- Fix some counters on ICMPv4.
+- Improvements on the GPRS protocol.
+- Support for flow serialization compress (30% network bandwith aprox).
+- Support of TCP/UDP timeout flows (180 seconds).
+- Support for specific statistics on the protocols (python binding).
+- Support for Virtual/Cloud enviroments with transparent GRE and VxLan on a new stack (StackVirtual).
+
+Features/Changes of 0.10
+- Improvements on the DNSProtocol (DNS hijack).
+- Filtering flows by condition (Python query example).
+- Release/clean protocol caches method. (Clean cache memory).
+- Support for OpenFlow networks.
+
+Features/Changes of 1.0
+- DatabaseAdaptors can be removed and added on execution.
+- Fix DNSQueryTypes minor issue.
+- Support for SIP protocol.
+- Support for ban HTTPFlows on callbaks using external intelligence (check test20 on pyai_tests.py)
+- Support for DDoS attacks by ussing getCounters functionatliy and the setScheduler method (check examples)
+
+Features/Changes of 1.1
+- MacOS support.
+- HTTPProtocol, DNSProtocol and SIPProtocol performance improvements (boost::string_ref, 32% performance).
+- DHCPProtocol support.
+- NTPProtocol support.
+- SMTPProtocol support.
+- PacketDispatcher now implements PEP 343 the 'with' statement (https://www.python.org/dev/peps/pep-0343/).
+- binary accepts chains of regex by command line.
+
+Features/Changes of 1.2
+- Generates Yara signatures (http://plusvic.github.io/yara/).
+- Performance improvements on the DomainNameManager getDomainName lookups.
+- Add the HTTPUriSet functionality for lookups on HTTP Uris.
+- IMAP, POP and SNMP(basic) support.
+- Improvements on the python API (PEP8).
+- Shows the memory comsumption of every protocol.
+- Support long buffers for regex generation and optimization of the regex generated.
+- Add more packet anomalies types.
+- Bug fixing.
+
+Features/Changes of 1.3
+- Support for Ruby Language.
+- Support for TCP QoS metrics (--enable-tcpqos).
+- Support for reject TCP/UDP connections on StackLans (--enable-reject).
+
+Features/Changes of 1.4
+- (TODO) Update on real time the setScheduler functionality (TODO multiple setScheduler, for having more functions).
+- Support for Java Language.
+- Support for RegexManagers on IPSets.
+- Support for network forensics on real time.
+- Enable rejecting for StackLanIPv6.
+- SSDP, Modbus and Bitcoin protocol support.
+- Support for regex on HTTP l7 payloads (DomainNames with RegexManagers).
+- Increase/Decrease allocated memory for protocols.
+- Improvements on the Memory management. Reduce size of Flow class.
+- Improvements for show objects on python.
+- Bug fixing.
+
+Features/Changes of 1.5
+- Support for Coap, mqtt, netbios and rtp protocols.
+- Support for Lua language. 
+- Support for anomaly handlers.
+- Bug fixing.
+
+Features/Changes of 1.6
+- Improvements on the Netbios protocol for handling names.
+- Support for callbacks on the RegexManager (python)
+- Improve the test for the lookups and change the 5tuple function.
+- Define a option on the configure script for allow to keep the flows on memory, for forensic analisys.
+- Improvements on the management of memory on the FrequencyProtocol. 
+- Add a new functionality for flushing flows to the caches by using the python/ruby/lua shell.
+- Add support for Quic protocol as well as support multicast dns.
+
+Features/Changes on 1.7.0
+- Improvements on the DNS to return machted CNAMES records.
+- Allow big packets of pcap files.
+- Lua: print objects over the interpreter.
+- Method show_current_packet from the PacketDispatcher.
+- Method show_protocol_statistics exposed on Python/Lua.
+- Allow list of Regex/DomainNames/IPs on the corresponding managers (python).
+- Allow to use Regex on HTTP uris.
+- Allow to use dynamic or static memory allocation.
+- Fix some minor bugs on IMAP, POP and SSL.
+
+Features/Changes on 1.8.0
+- Support for Point to Point over Ethernet protocol.
+- Support for multiple schedulers (multiple Timers).
+- Support for Radix trees on IP lookups (https://github.com/ytakano/radix_tree).
+- Support for SMB(Server Message Block) protocol.
+- Support for DHCPv6.
+- Provide assign IP address on the DHCP.
+- Minor issues and fixes on the SSL.
+- Minor Fixes and performance improvements on HTTP/SIP/POP/IMAP and SMTP.
+
+Features/Changes on 1.8.1
+- Support for Go language.
+- Support for SSH protocol.
+- Retrieve the SSL cipher id used on the conversation.
+- Optimization of DatabaseAdaptor handler.
+- Support for extract information from DNS TXT records.
+- Support for TLS on POP, IMAP and SMTP traffic. 
+- Add -Q option to the binary
+- Works on python 3.6
+- Minor improvements on some protocols (SMB)
+
+Features/Changes on 1.8.2 
+- Retrieve the HTTP Uri to the DatabaseAdaptor if matchs with a Regex or UriSet.
+- Fix issue with HTTP Payloads.
+- Allow to set the callback on the DomainName object (python).
+- Add anomaly for long emails on SMTP.
+- Fix minor issues on DNS
+- Support for DCERPC Protocol.
+- Improvements on cache system.
+- Improvement on SSL returning the commonName of the cert.
+
+Features/Changes on 1.8.3 
+- Enable and disable protocols on the bindings.
+- Reduce a 6% the memory comsumption of the Flows.
+- Support for logging the user interaction on log files (log_user_commands attribute on the PacketDispatcher)(python).
+- Support for shows matched domains and regexs on the DomainNameManager and RegexManager (python).
+- Improve the output of the messages (colors).
+
+Features/Changes on 1.9.0
+- Fix an issue on SSL issuer certificate.
+- Improvements on SSL for support TLS 1.3
+- Add new method, called reset, on the DomainNameManager, RegexManager and IPSetManager for reset the statistics.
+- Retrieve SIP SDP information of the VoIP call.
+- Support for Mobile IPv6 traffic on the GN interface.
+- Fix issue computing the memory comsumption on DCHP.
+- Expose the RegexManager on callbacks for set to other execution paths.
+
+Features/Changes on master
+- Compile in Windows?

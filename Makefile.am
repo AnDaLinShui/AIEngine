@@ -1,0 +1,63 @@
+AUTOMAKE_OPTIONS = foreign
+
+ACLOCAL_AMFLAGS = -I m4
+
+SUBDIRS = 	src \
+		man \
+		utils \
+		examples \
+		pcapfiles \
+		docs \
+		src/ipset \
+		src/regex \
+		src/user \
+		src/learner \
+		src/names \
+		src/flow \
+		src/protocols/ethernet \
+		src/protocols/vlan \
+		src/protocols/mpls \
+		src/protocols/pppoe \
+		src/protocols/ip \
+		src/protocols/ip6 \
+		src/protocols/gprs \
+		src/protocols/vxlan \
+		src/protocols/openflow \
+		src/protocols/gre \
+		src/protocols/icmp \
+		src/protocols/icmp6 \
+		src/protocols/udp \
+		src/protocols/tcp \
+		src/protocols/http \
+		src/protocols/ssl \
+		src/protocols/smtp \
+		src/protocols/pop \
+		src/protocols/imap \
+		src/protocols/modbus \
+		src/protocols/bitcoin \
+		src/protocols/mqtt \
+		src/protocols/dns \
+		src/protocols/sip \
+		src/protocols/dhcp \
+		src/protocols/ntp \
+		src/protocols/snmp \
+		src/protocols/ssdp \
+		src/protocols/coap \
+		src/protocols/rtp \
+		src/protocols/netbios \
+		src/protocols/quic \
+		src/protocols/smb \
+		src/protocols/dhcp6 \
+		src/protocols/ssh \
+		src/protocols/dcerpc \
+		src/protocols/tcpgeneric \
+		src/protocols/udpgeneric \
+		src/protocols/frequency 
+
+dist_noinst_SCRIPTS = autogen.sh
+
+EXTRA_DIST = README AUTHORS NEWS INSTALL README.md LICENSE.txt
+
+MAINTAINERCLEANFILES = config.h.in Makefile.in configure stamp-h1 config.log py-compile \
+        ltmain.sh missing install-sh depcomp config.sub config.guess aclocal.m4 config.h.in~
+

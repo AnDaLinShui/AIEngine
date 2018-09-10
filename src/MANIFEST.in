@@ -1,0 +1,47 @@
+include *.h
+include ../README.md
+recursive-include protocols/ethernet *.h 
+recursive-include protocols/mpls *.h 
+recursive-include protocols/vlan *.h 
+recursive-include protocols/vxlan *.h 
+recursive-include protocols/ip *.h 
+recursive-include protocols/ip6 *.h 
+recursive-include protocols/tcp *.h 
+recursive-include protocols/tcpgeneric *.h 
+recursive-include protocols/udp *.h 
+recursive-include protocols/udpgeneric *.h 
+recursive-include protocols/gprs *.h 
+recursive-include protocols/sip *.h 
+recursive-include protocols/gre *.h 
+recursive-include protocols/openflow *.h 
+recursive-include names *.h 
+recursive-include ipset *.h 
+recursive-include flow *.h 
+recursive-include learner *.h 
+recursive-include protocols/http *.h 
+recursive-include protocols/ssl *.h 
+recursive-include protocols/smtp *.h 
+recursive-include protocols/dns *.h 
+recursive-include regex *.h 
+recursive-include protocols/frequency *.h 
+recursive-include protocols/icmp *.h 
+recursive-include protocols/icmp6 *.h 
+recursive-include protocols/dhcp *.h 
+recursive-include protocols/dhcp6 *.h 
+recursive-include protocols/imap *.h 
+recursive-include protocols/ntp *.h 
+recursive-include protocols/pop *.h 
+recursive-include protocols/smtp *.h 
+recursive-include protocols/mqtt *.h 
+recursive-include protocols/netbios *.h 
+recursive-include protocols/coap *.h 
+recursive-include protocols/bitcoin *.h 
+recursive-include protocols/rtp *.h 
+recursive-include protocols/modbus *.h 
+recursive-include protocols/dcerpc *.h 
+recursive-include protocols/ssh *.h 
+recursive-include protocols/pppoe *.h 
+recursive-include protocols/quic *.h 
+recursive-include protocols/ssdp *.h 
+recursive-include protocols/snmp *.h 
+global-exclude test_* 

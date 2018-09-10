@@ -1,0 +1,154 @@
+/*
+ * AIEngine a new generation network intrusion detection system.
+ *
+ * Copyright (C) 2013-2018  Luis Campo Giralte
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Ryadnology Team; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the
+ * Ryadnology Team, 51 Franklin St, Fifth Floor,
+ * Boston, MA  02110-1301, USA.
+ *
+ * Written by Luis Campo Giralte <me@ryadpasha.com> 
+ *
+ */
+#ifndef SRC_FLOW_FLOWMANAGER_H_
+#define SRC_FLOW_FLOWMANAGER_H_
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/hashed_index.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/mem_fun.hpp>
+#include <fstream>
+#include <limits>
+#include "Flow.h"
+#include "Protocol.h"
+#include "FlowCache.h"
+#include "Cache.h"
+#include "OutputManager.h"
+
+namespace aiengine {
+
+struct flow_table_tag_unique;
+struct flow_table_tag_duration;
+
+typedef boost::multi_index::multi_index_container<
+	SharedPointer<Flow>,
+	boost::multi_index::indexed_by<
+		boost::multi_index::hashed_unique<
+                        boost::multi_index::tag<flow_table_tag_unique>,
+			boost::multi_index::const_mem_fun<Flow, unsigned long, &Flow::getId>
+		>,
+                boost::multi_index::ordered_non_unique<
+                        boost::multi_index::tag<flow_table_tag_duration>,
+                        boost::multi_index::const_mem_fun<Flow, int, &Flow::getLastPacketTime>,
+                        std::less<int> // The multiset is order by the most recent activity on the flow!!! 
+                > 
+	>
+>FlowTable;
+
+typedef FlowTable::nth_index<0>::type FlowByID;
+typedef FlowTable::nth_index<1>::type FlowByDuration;
+
+class FlowManager {
+public:
+    	explicit FlowManager(const std::string &name);
+    	explicit FlowManager(): FlowManager("FlowManager") {}
+    	virtual ~FlowManager();
+
+	static const int flowTimeRefreshRate = 64;
+	static const int flowTimeout = 180; // Seconds
+
+	void setReleaseFlows(bool value) { release_flows_ = value; }
+	bool haveReleaseFlows() const { return release_flows_; }
+
+	void addFlow(const SharedPointer<Flow> &flow);
+	void removeFlow(const SharedPointer<Flow> &flow);
+	SharedPointer<Flow>& findFlow(unsigned long hash1, unsigned long hash2);
+	void updateTimers(std::time_t current_time); 
+
+	void updateFlowTime(const SharedPointer<Flow> &flow, time_t time);
+
+	void setFlowCache(FlowCachePtr cache) { flow_cache_ = cache; }
+	void setTCPInfoCache(Cache<TCPInfo>::CachePtr cache) { tcp_info_cache_ = cache; }
+
+	void setTimeout(int timeout) { timeout_ = timeout; }
+	int getTimeout() const { return timeout_; }
+	int getTotalFlows() const { return flowTable_.size();}
+
+	int32_t getTotalProcessFlows() const { return total_process_flows_;}
+	int32_t getTotalTimeoutFlows() const { return total_timeout_flows_;}
+
+	void showFlows() { showFlows(std::numeric_limits<int>::max()); }
+	void showFlows(int limit);
+	void showFlows(const std::string &protoname) { showFlows(protoname, std::numeric_limits<int>::max());} 
+	void showFlows(const std::string &protoname, int limit); 
+	void showFlows(std::basic_ostream<char> &out, int limit);
+	void showFlows(std::basic_ostream<char> &out, const std::string &protoname, int limit);
+
+	int32_t getAllocatedMemory() const { return (flowTable_.size() * FlowCache::flowSize); }
+
+	// Method for flush the flows of the FlowManager in order to analyse more times
+	// This method just retrieve the flows to their corresponding caches and frees the 
+	// memory attached to them
+	void flush();
+
+#if defined(STAND_ALONE_TEST)
+	void showFlowsByTime(); 
+#endif
+
+	void statistics(std::basic_ostream<char> &out) { out << *this;} 
+        void statistics() { statistics(OutputManager::getInstance()->out());}
+
+	friend std::ostream& operator<< (std::ostream &out, const FlowManager &fm);
+
+	FlowTable getFlowTable() const { return flowTable_;}	
+	SharedPointer<Flow> getLastProcessFlow() const { return (*flow_it_); }
+	
+#if defined(PYTHON_BINDING)
+	// Methods for exposing the class to python iterable methods
+	FlowTable::iterator begin() { return flowTable_.begin(); }
+	FlowTable::iterator end() { return flowTable_.end(); }
+#endif
+	void setProtocol(ProtocolPtrWeak proto) { protocol_ = proto; }
+private:
+	void show_flows(std::basic_ostream<char> &out, std::function<bool (const Flow&)> condition); 
+	void print_pretty_flow(std::basic_ostream<char> &out, const Flow &flow, const char *proto_name);
+	void release_flow(const SharedPointer<Flow> &flow);
+
+	std::string name_;
+    	timeval now_;
+	int32_t total_process_flows_;
+	int32_t total_timeout_flows_;
+	int timeout_;
+	bool release_flows_;
+    	FlowTable flowTable_;
+	FlowByID::iterator flow_it_; // a cacheable iterator
+	FlowCachePtr flow_cache_;
+	Cache<TCPInfo>::CachePtr tcp_info_cache_;
+	ProtocolPtrWeak protocol_;
+	SharedPointer<Flow> lookup_flow_; // cacheable flow;
+#if defined(PYTHON_BINDING) 
+	std::ofstream output_term_;
+#endif
+};
+
+typedef std::shared_ptr<FlowManager> FlowManagerPtr;
+typedef std::weak_ptr<FlowManager> FlowManagerPtrWeak;
+
+} // namespace aiengine
+
+#endif  // SRC_FLOW_FLOWMANAGER_H_

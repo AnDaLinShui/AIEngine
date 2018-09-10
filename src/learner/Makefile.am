@@ -1,0 +1,23 @@
+AUTOMAKE_OPTIONS = gnu
+
+noinst_HEADERS =	test_learner.h
+
+TEST = test_learner
+
+check_PROGRAMS = test_learner
+
+test_learner_SOURCES = 	../protocols/frequency/PacketFrequencies.cc \
+			LearnerEngine.cc \
+			test_learner.cc
+
+test_learner_CPPFLAGS = $(EXTRA_TEST_CPPFLAGS) -I.. $(BOOST_CPPFLAGS) -DSTAND_ALONE_TEST
+test_learner_LDFLAGS = $(EXTRA_TEST_LDFLAGS)
+test_learner_LDADD   = $(BOOST_LDFLAGS) -lboost_unit_test_framework
+
+CLEANFILES = *.o *.lo *.so
+
+MAINTAINERCLEANFILES = \
+        $(srcdir)/Makefile \
+        $(srcdir)/Makefile.in \
+        `rm -rf $(srcdir)/build `
+

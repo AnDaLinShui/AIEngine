@@ -1,0 +1,475 @@
+Installing on Linux systems.
+----------------------------
+
+Mandatory options
+- Notice that g++ with c++11 is available on compilers up to 4.7.6 versions. Some compilers 4.8.2 dont have full support
+  for all the standard 11 on the compiler. Our recomendation is to use a 5.x version compiler.
+- Boost also is need on versions 1.50 or greater (with boost::string_ref support).
+- Libpcap-dev 0.8. 
+- Libpcre-dev.
+
+Optional
+- Python 2.7,3.3 and 3.4 If you expect to have the python binding.
+- Ruby dev if expected to have ruby support.
+- Swig for generate Java/Ruby and Lua interfaces.
+- Log4cxx is optional.
+
+./configure
+make 
+make install
+
+Can not find boost asio.
+------------------------
+
+./configure --with-boost-libdir=/lib64/
+
+Installing on BSD systems.
+--------------------------
+
+./configure
+make 
+make install
+
+Using the bloom filters (Experimental).
+---------------------------------------
+
+AIEngine could use the boost bloom filters, so in order to compile the library
+with the boost bloom filters you must download the project from  the following
+address https://github.com/cabrera/boost-bloom-filters. Second, copy the corresponding
+header files on the same paht of your boost library (/usr/include, /usr/local/include).
+Third, enable the configure script with --enable-bloomfilter and verify the outuput
+
+checking whether to build bloom filters... yes
+checking boost/bloom_filter/basic_bloom_filter.hpp usability... yes
+checking boost/bloom_filter/basic_bloom_filter.hpp presence... yes
+checking for boost/bloom_filter/basic_bloom_filter.hpp... yes
+
+and make
+
+
+Using a different python version (Experimental).
+------------------------------------------------
+
+- The base system is designed for 2.7 python versions but I have the plans
+  to migrate to the 3.x python series.
+- Just overwrite PYTHON and PYTHON_VERSION variables in order to compile 
+  aiengine in other python versions.
+- The setup.py is working so you can use also python setup.py build_ext -i
+
+PYTHON=/usr/bin/python3.3 PYTHON_VERSION=3.3 ./configure
+
+Generate a distribution
+-----------------------
+
+make dist
+
+Verifies that the generated package compiles.
+
+On some systems is necesary to setup the env variable export TAR_OPTIONS="--owner=0 --group=0 --numeric-owner"
+for generate the .tar.gz file.
+
+
+Some configure output from supported systems
+--------------------------------------------
+
+  aiengine on Debian with Python 3.3
+  (aiengine) version 0.8
+  Host................: x86_64-unknown-linux-gnu
+  Prefix..............: /usr/local
+  Debug Build.........: no
+  C++ version.........: g++ (Debian 4.8.2-14) 4.8.2
+  C++ compiler........: g++ -O3  -std=c++11 -Wno-write-strings   
+  C++11 support.......: yes
+  Linker..............: /usr/bin/ld -m elf_x86_64  -lpcap 
+  Boost include.......: -I/usr/include/boost
+  Boost...............: 1.48.0
+  Boost unit tests....: no
+  Boost python lib....: boost_python-py33
+  Python..............: 3.3 
+  Python include path.: -I/usr/include/python3.3m
+  Log4cxx.............: yes
+  Libpcap.............: yes
+  Pcre................: yes
+  Pcre JIT............: yes
+  Database support....: no
+  Bloom filter support: no
+
+  aiengine on Debian with Python 2.7
+  (aiengine) version 0.8
+  Host................: x86_64-unknown-linux-gnu
+  Prefix..............: /usr/local
+  Debug Build.........: no
+  C++ version.........: g++ (Debian 4.8.2-14) 4.8.2
+  C++ compiler........: g++ -O3  -std=c++11 -Wno-write-strings   
+  C++11 support.......: yes
+  Linker..............: /usr/bin/ld -m elf_x86_64  -lpcap 
+  Boost include.......: -I/usr/include/boost
+  Boost...............: 1.48.0
+  Boost unit tests....: no
+  Boost python lib....: boost_python-py27
+  Python..............: 2.7 
+  Python include path.: -I/usr/include/python2.7
+  Log4cxx.............: yes
+  Libpcap.............: yes
+  Pcre................: yes
+  Pcre JIT............: yes
+  Database support....: no
+  Bloom filter support: no
+
+  aiengine on FreeBSD 10 with Python 2.7
+  (aiengine) version 0.8
+  Host................: i386-unknown-freebsd10.0
+  Prefix..............: /usr/local
+  Debug Build.........: no
+  C++ version.........: FreeBSD clang version 3.3 (tags/RELEASE_33/final 183502) 20130610
+  C++ compiler........: c++ -O3  -std=c++11 -Wno-write-strings   -I/usr/local/include
+  C++11 support.......: yes
+  Linker..............: /usr/bin/ld  -lpcap 
+  Boost include.......: -I/usr/local/include/boost
+  Boost...............: 1.48.0
+  Boost unit tests....: no
+  Boost python lib....: boost_python
+  Python..............: 2.7 
+  Python include path.: -I/usr/local/include/python2.7
+  Log4cxx.............: no
+  Libpcap.............: yes
+  Pcre................: yes
+  Pcre JIT............: yes
+  Database support....: no
+  Bloom filter support: no
+
+  aiengine on Fedora with Python 2.7
+  (aiengine) version 0.8
+  Host................: x86_64-unknown-linux-gnu
+  Prefix..............: /usr/local
+  Debug Build.........: no
+  C++ version.........: g++ (GCC) 4.8.2 20131212 (Red Hat 4.8.2-7)
+  C++ compiler........: g++ -O3  -std=c++11 -Wno-write-strings   
+  C++11 support.......: yes
+  Linker..............: /usr/bin/ld -m elf_x86_64  -lpcap 
+  Boost include.......: -I/usr/include/boost
+  Boost...............: 1.48.0
+  Boost unit tests....: no
+  Boost python lib....: boost_python-py27
+  Python..............: 2.7 
+  Python include path.: -I/usr/include/python2.7
+  Log4cxx.............: no
+  Libpcap.............: yes
+  Pcre................: yes
+  Pcre JIT............: yes
+  Database support....: no
+  Bloom filter support: no
+
+  aiengine
+  (aiengine) version 1.3
+  Host..................: x86_64-unknown-linux-gnu
+  Prefix................: /usr/local
+  Debug Build...........: no
+  C++ version...........: g++ (GCC) 4.8.3 20140911 (Red Hat 4.8.3-7)
+  C++ compiler..........: g++ -O3  -std=c++11 -Wno-write-strings   
+  C++11 support.........: yes
+  Linker................: /usr/bin/ld -m elf_x86_64  -lpcap 
+  Boost include.........: -I/usr/include/boost
+  Boost.................: 1.50.0
+  Boost unit tests......: no
+  Boost python lib......: boost_python
+  Python................: 2.7 
+  Python include path...: -I/usr/include/python2.7
+  Log4cxx...............: no
+  Libpcap...............: yes
+  Pcre..................: yes
+  Pcre JIT..............: yes
+  Database support......: no
+  Bloom filter support..: no
+  Flow sc support.......: no
+  Swig support..........: yes
+  TCP Qos support.......: yes
+  TCP/UDP reject support: yes
+
+  // Tested with c++14! with compiler 5.1.1
+  aiengine
+  (aiengine) version 1.3
+  Host..................: x86_64-unknown-linux-gnu
+  Prefix................: /usr/local
+  Debug Build...........: no
+  C++ version...........: g++ (GCC) 5.1.1 20150618 (Red Hat 5.1.1-4)
+  C++ compiler..........: g++ -O3  -std=c++14 -Wno-write-strings   
+  C++11 support.........: yes
+  Linker................: /usr/bin/ld -m elf_x86_64  -lpcap 
+  Boost include.........: -I/usr/include/boost
+  Boost.................: 1.50.0
+  Boost unit tests......: no
+  Boost python lib......: boost_python
+  Python................: 2.7 
+  Python include path...: -I/usr/include/python2.7
+  Log4cxx...............: no
+  Libpcap...............: yes
+  Pcre..................: yes
+  Pcre JIT..............: yes
+  Database support......: no
+  Bloom filter support..: no
+  Flow sc support.......: no
+  Swig/Ruby support.....: no
+  TCP Qos support.......: no
+  TCP/UDP reject support: no
+
+  aiengine
+  (aiengine) version 1.6
+  Host..................: x86_64-unknown-linux-gnu
+  Prefix................: /usr/local
+  Debug Build...........: no
+  C++ version...........: g++ (GCC) 6.1.1 20160621 (Red Hat 6.1.1-3)
+  C++ compiler..........: g++ -O3  -std=c++11 -Wno-write-strings   
+  C++11 support.........: yes
+  Linker................: /usr/bin/ld -m elf_x86_64  -lpcap 
+  Boost include.........: -I/usr/include/boost
+  Boost.................: 1.50.0
+  Boost unit tests......: no
+  Boost python lib......: boost_python
+  Python................: 2.7 
+  Python include path...: -I/usr/include/python2.7
+  Log4cxx...............: no
+  Libpcap...............: yes
+  Pcre..................: yes
+  Pcre JIT..............: yes
+  Database support......: no
+  Bloom filter support..: no
+  Flow sc support.......: no
+  Swig/Ruby support.....: yes
+  Swig/Java support.....: yes
+  Swig/Lua support......: yes
+  TCP Qos support.......: no
+  TCP/UDP reject support: no
+  Release flow support..: yes
+  Python GIL support....: no
+  Static memory support.: no
+  Code coverage.........: no
+
+  aiengine
+  (aiengine) version 1.6
+  Host..................: x86_64-unknown-linux-gnu
+  Prefix................: /usr/local
+  Debug Build...........: no
+  C++ version...........: g++ (GCC) 6.2.1 20160916 (Red Hat 6.2.1-2)
+  C++ compiler..........: g++ -O3  -std=c++11 -Wno-write-strings   
+  C++11 support.........: yes
+  Linker................: /usr/bin/ld -m elf_x86_64  -lpcap 
+  Boost include.........: -I/usr/include/boost
+  Boost.................: 1.50.0
+  Boost unit tests......: no
+  Boost python lib......: boost_python3
+  Python................: 3.5 
+  Python include path...: -I/usr/include/python3.5m
+  Log4cxx...............: no
+  Libpcap...............: yes
+  Pcre..................: yes
+  Pcre JIT..............: yes
+  Database support......: no
+  Bloom filter support..: no
+  Flow sc support.......: no
+  Swig/Ruby support.....: yes
+  Swig/Java support.....: yes
+  Swig/Lua support......: yes
+  TCP Qos support.......: no
+  TCP/UDP reject support: no
+  Release flow support..: yes
+  Python GIL support....: no
+  Static memory support.: no
+  Code coverage.........: no
+
+  // On a mips
+  aiengine
+  (aiengine) version 1.6
+  Host..................: mips64el-unknown-linux-gnu
+  Prefix................: /usr/local
+  Debug Build...........: no
+  C++ version...........: g++ (GCC) 5.2.1 20151104 (Red Hat 5.2.1-4.1)
+  C++ compiler..........: g++ -O3  -std=c++11 -Wno-write-strings   
+  C++11 support.........: yes
+  Linker................: /usr/bin/ld -m elf  -lpcap 
+  Boost include.........: -I/usr/include/boost
+  Boost.................: 1.50.0
+  Boost unit tests......: no
+  Boost python lib......: boost_python
+  Python................: 2.7 
+  Python include path...: -I/usr/include/python2.7
+  Log4cxx...............: no
+  Libpcap...............: yes
+  Pcre..................: yes
+  Pcre JIT..............: yes
+  Database support......: no
+  Bloom filter support..: no
+  Flow sc support.......: no
+  Swig/Ruby support.....: no
+  Swig/Java support.....: no
+  Swig/Lua support......: no
+  TCP Qos support.......: no
+  TCP/UDP reject support: no
+  Release flow support..: yes
+  Python GIL support....: no
+  Static memory support.: no
+  Code coverage.........: no
+
+  // on ARM architecture
+  aiengine
+  (aiengine) version 1.6
+  Host..................: armv7l-unknown-linux-gnueabihf
+  Prefix................: /usr/local
+  Debug Build...........: no
+  C++ version...........: g++ (GCC) 5.3.1 20160406 (Red Hat 5.3.1-6)
+  C++ compiler..........: g++ -O3  -std=c++11 -Wno-write-strings   
+  C++11 support.........: yes
+  Linker................: /usr/bin/ld  -lpcap 
+  Boost include.........: -I/usr/include/boost
+  Boost.................: 1.50.0
+  Boost unit tests......: no
+  Boost python lib......: boost_python
+  Python................: 2.7 
+  Python include path...: -I/usr/include/python2.7
+  Log4cxx...............: no
+  Libpcap...............: yes
+  Pcre..................: yes
+  Pcre JIT..............: yes
+  Database support......: no
+  Bloom filter support..: no
+  Flow sc support.......: no
+  Swig/Ruby support.....: no
+  Swig/Java support.....: no
+  Swig/Lua support......: no
+  TCP Qos support.......: no
+  TCP/UDP reject support: no
+  Release flow support..: yes
+  Python GIL support....: no
+  Static memory support.: no
+  Code coverage.........: no
+
+  aiengine
+  (aiengine) version 1.7
+  Host..................: armv7l-unknown-linux-gnueabihf
+  Prefix................: /usr/local
+  Debug Build...........: no
+  C++ version...........: g++ (GCC) 5.3.1 20160406 (Red Hat 5.3.1-6)
+  C++ compiler..........: g++ -O3  -std=c++11 -Wno-write-strings   
+  C++11 support.........: yes
+  Linker................: /usr/bin/ld  -lpcap 
+  Boost include.........: -I/usr/include/boost
+  Boost.................: 1.50.0
+  Boost unit tests......: no
+  Boost python lib......: boost_python
+  Python................: 2.7 
+  Python include path...: -I/usr/include/python2.7
+  Log4cxx...............: no
+  Libpcap...............: yes
+  Pcre..................: yes
+  Pcre JIT..............: yes
+  Database support......: no
+  Bloom filter support..: no
+  Flow sc support.......: no
+  Swig support..........: no
+  Swig/Ruby support.....: no
+  Swig/Java support.....: no
+  Swig/Lua support......: no
+  TCP Qos support.......: no
+  TCP/UDP reject support: no
+  Release flow support..: yes
+  Python GIL support....: no
+  Static memory support.: no
+  Code coverage.........: no
+
+ aiengine
+  (aiengine) version 1.7.0
+  Host..................: armv7l-unknown-linux-gnueabihf
+  Prefix................: /usr
+  Debug Build...........: no
+  C++ version...........: g++ (GCC) 6.3.1 20170109
+  C++ compiler..........: g++  -std=c++11 -Wno-write-strings
+  C++11 support.........: yes
+  Linker................: /usr/bin/ld
+  Boost include.........: -I/usr/include/boost
+  Boost.................: 1.50.0
+  Boost unit tests......: no
+  Boost python lib......: boost_python
+  Python................: 2.7
+  Python include path...: -I/usr/include/python2.7
+  Log4cxx...............: yes
+  Libpcap...............: yes
+  Pcre..................: yes
+  Pcre JIT..............: yes
+  Database support......: yes
+  Bloom filter support..: yes
+  Flow sc support.......: yes
+  Swig support..........: no
+  Swig/Ruby support.....: no
+  Swig/Java support.....: no
+  Swig/Lua support......: no
+  TCP Qos support.......: yes
+  TCP/UDP reject support: yes
+  Release flow support..: yes
+  Python GIL support....: yes
+  Static memory support.: no
+  Code coverage.........: no
+
+  aiengine
+  (aiengine) version 1.8.0
+  Host..................: x86_64-pc-linux-gnu
+  Prefix................: /usr/local
+  Debug Build...........: no
+  C++ version...........: g++ (GCC) 7.1.1 20170622 (Red Hat 7.1.1-3)
+  C++ compiler..........: g++  -std=c++14 -Wno-write-strings  
+  C++11 support.........: yes
+  Linker................: /usr/bin/ld -m elf_x86_64  -lpcap 
+  Boost include.........: -I/usr/include/boost
+  Boost.................: 1.50.0
+  Boost python lib......: boost_python
+  Python................: 2.7 
+  Python include path...: -I/usr/include/python2.7
+  Log4cxx...............: no
+  Libpcap...............: yes
+  Pcre..................: yes
+  Pcre JIT..............: yes
+  Bloom filter support..: no
+  Swig support..........: yes
+  Swig/Ruby support.....: yes
+  Swig/Java support.....: yes
+  Swig/Lua support......: yes
+  Swig/Go support.......: yes
+  TCP Qos support.......: no
+  TCP/UDP reject support: no
+  Python GIL support....: no
+  Static memory support.: no
+  Code coverage.........: no
+
+  [11/20/17 20:56:03] Lan network stack ready.
+  [11/20/17 20:56:03] Python 3.6.3 AIEngine 1.8.2 shell enable on Linux kernel 4.13.12-300.fc27.x86_64 x86_64
+  [11/20/17 20:56:03] Processing packets from device lo
+  [11/20/17 20:56:03] Stack 'Lan network stack' using 35 KBytes of memory
+
+  [11/20/17 20:27:42] Lan network stack ready.
+  [11/20/17 20:27:42] Python 2.7.14 AIEngine 1.8.2 shell enable on Linux kernel 4.13.12-300.fc27.x86_64 x86_64
+  [11/20/17 20:27:42] Processing packets from device lo
+  [11/20/17 20:27:42] Stack 'Lan network stack' using 35 KBytes of memory
+
+  [11/19/17 21:51:31] Lan network stack ready.
+  [11/19/17 21:51:31] Python 2.7.12 AIEngine 1.8.1 shell enable on Linux kernel 4.4.0-92-generic x86_64
+  [11/19/17 21:51:31] Processing packets from device enp0s31f6
+  [11/19/17 21:51:31] Stack 'Lan network stack' using 35 KBytes of memory
+
+  [11/20/17 18:48:51] Lan network stack ready.
+  [11/20/17 18:48:51] Python 2.7.11 AIEngine 1.8.2 shell enable on Linux kernel 4.2.3-300.fc23.armv7hl armv7l
+  [11/20/17 18:48:51] Processing packets from device eth0
+  [11/20/17 18:48:51] Stack 'Lan network stack' using 21 KBytes of memory
+
+  [11/19/17 22:04:47] Lan network stack ready.
+  [11/19/17 22:04:47] Enable NIDSEngine on Lan network stack
+  [11/19/17 22:04:47] Lua 5.1 AIEngine 1.8.2 shell enable on Linux kernel 4.4.0-92-generic x86_64
+  [11/19/17 22:04:47] Processing packets from device enp0s31f6
+
+  [11/21/17 21:42:47] Lan network stack ready.
+  [11/21/17 21:42:47] Python 2.7.14 AIEngine 1.8.2 shell enable on FreeBSD kernel 11.1-STABLE amd64
+  [11/21/17 21:42:47] Processing packets from device vtnet0
+  [11/21/17 21:42:47] Stack 'Lan network stack' using 27 KBytes of memory
+
+  [02/21/18 19:57:28] Lan network stack ready.
+  [02/21/18 19:57:28] Python 2.7.11 AIEngine 1.8.3 shell enable on Linux kernel 4.2.3-300.fc23.armv7hl armv7l
+  [02/21/18 19:57:28] Processing packets from device eth0
+  [02/21/18 19:57:28] Stack 'Lan network stack' using 21 KBytes of memory
