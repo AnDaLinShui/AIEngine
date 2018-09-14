@@ -226,4 +226,6 @@ If you are interested in a specific functionality, promote the project or just n
 AIEngine have been develop using test driven development. So in order to maintain the same life cycle, the new functionatly should have unit test on the directory created of the new functionality and for integrate with all the system, later integrate with the main tests.cc file on the /src directory
 
 ## Discussion
+If you have questions or problems with installation or usage [create an Issue](https://github.com/ryadpasha/aiengine).
+
 For any queries contact me at: **me@ryadpasha.com**
